@@ -1,0 +1,9 @@
+numpy
+networkx
+matplotlib
+pandas
+geopandas
+momepy
+contextily
+pathlib
+shapely
