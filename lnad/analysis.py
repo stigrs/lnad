@@ -41,9 +41,9 @@ def eigenvector_centrality(G, weight=None):
 def betweenness_centrality(G, weight=None):
     """Compute betweenness centrality for the nodes."""
     if G.is_directed():
-        normalize = 1.0 / ((G.vcount() - 1.0) * (G.vcount() - 2.0))
+        normalize = 1 / ((G.vcount() - 1) * (G.vcount() - 2))
     else:
-        normalize = 2.0 / ((G.vcount() - 1.0) * (G.vcount() - 2.0))
+        normalize = 2 / ((G.vcount() - 1) * (G.vcount() - 2))
     centrality = {
         G.vs[idx]: d * normalize
         for idx, d in enumerate(G.betweenness(directed=G.is_directed(), weights=weight))
@@ -57,9 +57,9 @@ def betweenness_centrality(G, weight=None):
 def edge_betweenness_centrality(G, weight=None):
     """Compute betweenness centrality for the edges."""
     if G.is_directed():
-        normalize = 1.0 / (G.vcount() * (G.vcount() - 1.0))
+        normalize = 1 / (G.vcount() * (G.vcount() - 1))
     else:
-        normalize = 2.0 / (G.vcount() * (G.vcount() - 1.0))
+        normalize = 2 / (G.vcount() * (G.vcount() - 1))
     centrality = {
         G.es[idx]: d * normalize
         for idx, d in enumerate(
