@@ -71,7 +71,15 @@ class GeoNetwork:
         self.__multigraph = multigraph
         self.load(filename, multigraph, explode, capacity, epsg)
 
-    def load(self, filename, multigraph=False, explode=False, capacity=None, epsg=None):
+    def load(
+        self,
+        filename,
+        multigraph=False,
+        explode=False,
+        capacity=None,
+        epsg=None,
+        factor=1.0,
+    ):
         """Load geodata for network from file (e.g. GEOJSON format)."""
         if pathlib.Path(filename).suffix == ".csv":
             df = pd.read_csv(filename)
@@ -96,12 +104,16 @@ class GeoNetwork:
                 to_replace=0.0, value=np.finfo(float).eps
             )
             # shortest path weights are calculated as the resiprocal of the capacity
-            self.grid["weight"] = 1.0 / self.grid[capacity]
+            self.grid["weight"] = factor / self.grid[capacity]
         self.graph = momepy.gdf_to_nx(self.grid, multigraph=multigraph, directed=False)
 
     def get_graph(self):
         """Return a deep copy of the graph."""
         return copy.deepcopy(self.graph)
+
+    def write_gml(self, path, stringizer=None):
+        """Write topology to GML file."""
+        nx.write_gml(self.graph, path, stringizer=stringizer)
 
     def remove_false_nodes(self):
         """Clean topology of existing LineString geometry by removal of nodes of degree 2."""

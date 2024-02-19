@@ -6,7 +6,9 @@
 
 """Provides methods for network analysis."""
 
+import igraph as ig
 import networkx as nx
+import numpy as np
 import pandas as pd
 import operator
 import pathlib
@@ -15,8 +17,7 @@ import matplotlib.pyplot as plt
 
 def degree_centrality(G, weight=None):
     """Compute degree centrality for the nodes."""
-    centrality = list(nx.degree_centrality(G).values())
-    centrality = {n: d for n, d in zip(G.nodes, centrality)}
+    centrality = {G.vs[idx]: d / (G.vcount() - 1) for idx, d in enumerate(G.degree())}
     centrality = dict(
         sorted(centrality.items(), key=operator.itemgetter(1), reverse=True)
     )
@@ -25,8 +26,12 @@ def degree_centrality(G, weight=None):
 
 def eigenvector_centrality(G, weight=None):
     """Compute eigenvector centrality for the nodes."""
-    centrality = list(nx.eigenvector_centrality(G, weight=weight).values())
-    centrality = {n: d for n, d in zip(G.nodes, centrality)}
+    centrality = {
+        G.vs[idx]: d
+        for idx, d in enumerate(
+            G.eigenvector_centrality(directed=G.is_directed(), weights=weight, scale=False)
+        )
+    }
     centrality = dict(
         sorted(centrality.items(), key=operator.itemgetter(1), reverse=True)
     )
@@ -35,8 +40,14 @@ def eigenvector_centrality(G, weight=None):
 
 def betweenness_centrality(G, weight=None):
     """Compute betweenness centrality for the nodes."""
-    centrality = list(nx.betweenness_centrality(G, weight=weight).values())
-    centrality = {n: d for n, d in zip(G.nodes, centrality)}
+    if G.is_directed():
+        normalize = 1.0 / ((G.vcount() - 1.0) * (G.vcount() - 2.0))
+    else:
+        normalize = 2.0 / ((G.vcount() - 1.0) * (G.vcount() - 2.0))
+    centrality = {
+        G.vs[idx]: d * normalize
+        for idx, d in enumerate(G.betweenness(directed=G.is_directed(), weights=weight))
+    }
     centrality = dict(
         sorted(centrality.items(), key=operator.itemgetter(1), reverse=True)
     )
@@ -45,8 +56,16 @@ def betweenness_centrality(G, weight=None):
 
 def edge_betweenness_centrality(G, weight=None):
     """Compute betweenness centrality for the edges."""
-    centrality = list(nx.edge_betweenness_centrality(G, weight=weight).values())
-    centrality = {n: d for n, d in zip(G.edges, centrality)}
+    if G.is_directed():
+        normalize = 1.0 / (G.vcount() * (G.vcount() - 1.0))
+    else:
+        normalize = 2.0 / (G.vcount() * (G.vcount() - 1.0))
+    centrality = {
+        G.es[idx]: d * normalize
+        for idx, d in enumerate(
+            G.edge_betweenness(directed=G.is_directed(), weights=weight)
+        )
+    }
     centrality = dict(
         sorted(centrality.items(), key=operator.itemgetter(1), reverse=True)
     )
@@ -55,8 +74,7 @@ def edge_betweenness_centrality(G, weight=None):
 
 def closeness_centrality(G, weight=None):
     """Compute closeness centrality for the nodes."""
-    centrality = list(nx.closeness_centrality(G, distance=weight).values())
-    centrality = {n: d for n, d in zip(G.nodes, centrality)}
+    centrality = {G.vs[idx]: d for idx, d in enumerate(G.closeness(weights=weight))}
     centrality = dict(
         sorted(centrality.items(), key=operator.itemgetter(1), reverse=True)
     )
@@ -65,34 +83,32 @@ def closeness_centrality(G, weight=None):
 
 def pagerank(G, weight=None):
     """Compute PageRank for the nodes."""
-    rank = list(nx.pagerank(G, weight=weight).values())
-    rank = {n: d for n, d in zip(G.nodes, rank)}
+    rank = {
+        G.vs[idx]: d
+        for idx, d in enumerate(G.pagerank(directed=G.is_directed(), weights=weight))
+    }
     rank = dict(sorted(rank.items(), key=operator.itemgetter(1), reverse=True))
     return rank
 
 
 def articulation_points(G):
     """Find the articulation points of the network."""
-    if nx.is_directed(G):
-        return list(nx.articulation_points(G.to_undirected()))
-    else:
-        return list(nx.articulation_points(G))
+    return G.articulation_points()
 
 
 def largest_connected_component(G):
     """Return size of largest connected component of the network."""
-    return len(max(nx.connected_components(G), key=len))
+    return G.connected_components().giant().vcount()
 
 
 def largest_connected_component_subgraph(G):
     """Return largest connected component as a subgraph."""
-    lcc = max(nx.connected_components(G), key=len)
-    return G.subgraph(lcc).copy()
+    return G.connected_components().giant()
 
 
 def second_largest_connected_component(G):
     """Return size of second-largest connected component of the network."""
-    slcc = [len(c) for c in sorted(nx.connected_components(G), key=len, reverse=True)]
+    slcc = sorted(G.connected_components().sizes(), reverse=True)
     if len(slcc) > 1:
         return slcc[1]
     else:
@@ -111,17 +127,14 @@ def global_efficiency(G, weight=None):
           analysis of link removal strategies in real complex weighted networks.
           Sci Rep 10, 3911 (2020). https://doi.org/10.1038/s41598-020-60298-7
     """
-    n = G.number_of_nodes()
+    n = G.vcount()
     if n < 2:
         eff = 0
     else:
         inv_d = []
-        for node in G:
-            if weight is None:
-                dij = nx.single_source_shortest_path_length(G, node)
-            else:
-                dij = nx.single_source_dijkstra_path_length(G, node, weight=weight)
-            inv_dij = [1 / d for d in dij.values() if d != 0]
+        for v in G.vs:
+            dij = G.distances(v, weights=weight, mode="all")[0]
+            inv_dij = [1 / d for d in dij if not (d == 0 or np.isinf(d))]
             inv_d.extend(inv_dij)
         eff = sum(inv_d) / (n * (n - 1))
     return eff
@@ -131,13 +144,12 @@ class NetworkAnalysis:
     """Class for doing network analysis on graphs."""
     def __init__(self, G=None):
         self.graph = None
-        if G:
-            if (
-                isinstance(G, nx.Graph)
-                or isinstance(G, nx.DiGraph)
-                or isinstance(G, nx.MultiGraph)
-            ):
-                self.graph = G
+        if G and isinstance(G, ig.Graph):
+            self.graph = G
+
+    def read(self, filename, format=None):
+        """Read a graph from file."""
+        self.graph = ig.Graph.Read(filename, format=format)
 
     def read_edgelist(
         self,
@@ -150,7 +162,8 @@ class NetworkAnalysis:
         encoding="utf-8",
     ):
         """Read a graph from a list of edges."""
-        self.graph = nx.read_edgelist(
+        # NetworkX is used to read the data and then the graph is converted to igraph
+        G = nx.read_edgelist(
             filename,
             comments=comments,
             delimiter=delimiter,
@@ -159,15 +172,16 @@ class NetworkAnalysis:
             data=data,
             encoding=encoding,
         )
+        self.graph = ig.Graph.from_networkx(G)
 
     def read_adjacency(self, filename, index_col=0, create_using=nx.Graph):
         """Load network from CSV file with interdependency matrix."""
+        # NetworkX is used to read the data and then the graph is converted to igraph
         if pathlib.Path(filename).suffix == ".csv":
             df = pd.read_csv(filename, index_col=index_col)
             # need to make sure dependency is interpreted as j --> i
-            self.graph = nx.from_pandas_adjacency(
-                df.transpose(), create_using=create_using
-            )
+            G = nx.from_pandas_adjacency(df.transpose(), create_using=create_using)
+            self.graph = ig.Graph.from_networkx(G)
         else:
             self.graph = None
 
@@ -204,11 +218,5 @@ class NetworkAnalysis:
     def global_efficiency(self, weight=None):
         return global_efficiency(self.graph, weight=weight)
 
-    def draw(
-        self, layout=None, node_size=300, with_labels=True, figsize=(12, 12), dpi=300
-    ):
-        _, ax = plt.subplots(figsize=figsize, dpi=dpi)
-        pos = layout(self.graph)
-        nx.draw_networkx(
-            self.graph, pos=pos, ax=ax, node_size=node_size, with_labels=with_labels
-        )
+    def plot(self, **visual_style):
+        ig.plot(self.graph, **visual_style)

@@ -20,6 +20,8 @@ requirements:
     - python
     - numpy
     - networkx
+    - igraph
+    - pycairo
     - matplotlib
     - pandas
     - geopandas

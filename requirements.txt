@@ -1,5 +1,7 @@
 numpy
 networkx
+igraph
+pycairo
 matplotlib
 pandas
 geopandas
