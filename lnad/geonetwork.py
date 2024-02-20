@@ -7,6 +7,7 @@
 """Provides methods for handling networks with geographic data."""
 
 import numpy as np
+import igraph as ig
 import networkx as nx
 import pandas as pd
 import geopandas as gpd
@@ -110,6 +111,10 @@ class GeoNetwork:
     def get_graph(self):
         """Return a deep copy of the graph."""
         return copy.deepcopy(self.graph)
+
+    def get_igraph(self):
+        """Return graph as igraph."""
+        return ig.Graph.from_networkx(self.graph)
 
     def write_gml(self, path, stringizer=None):
         """Write topology to GML file."""
