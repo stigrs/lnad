@@ -79,8 +79,8 @@ class NetworkDismantling:
             nattacks = self.graph.vcount()
 
         graph_attacked = self.get_graph()  # work on a local copy of the network
-        nodes_attacked = [0]  # list with coordinates of attacked nodes
-        centrality = [0]  # list with centralities of attacked nodes
+        nodes_attacked = []  # list with coordinates of attacked nodes
+        centrality = []  # list with centralities of attacked nodes
 
         lcc = [lnad.largest_connected_component(graph_attacked)]
         slcc = [lnad.second_largest_connected_component(graph_attacked)]
@@ -89,8 +89,8 @@ class NetworkDismantling:
         for _ in range(nattacks):
             bc = centrality_method(graph_attacked, weight)
             node = list(bc.keys())[0]
+            nodes_attacked.append(node["name"])
             graph_attacked.delete_vertices(node)
-            nodes_attacked.append(node)
             lcc.append(lnad.largest_connected_component(graph_attacked))
             slcc.append(lnad.second_largest_connected_component(graph_attacked))
             eff.append(lnad.global_efficiency(graph_attacked, weight))
@@ -122,8 +122,8 @@ class NetworkDismantling:
             nattacks = self.graph.ecount()
 
         graph_attacked = self.get_graph()  # work on a local copy of the topology
-        edges_attacked = [0]  # list with coordinates of attacked edges
-        centrality = [0]  # list with centralities of attacked nodes
+        edges_attacked = []  # list with coordinates of attacked edges
+        centrality = []  # list with centralities of attacked nodes
 
         lcc = [lnad.largest_connected_component(graph_attacked)]
         slcc = [lnad.second_largest_connected_component(graph_attacked)]
@@ -132,8 +132,10 @@ class NetworkDismantling:
         for _ in range(nattacks):
             bc = centrality_method(graph_attacked, weight)
             edge = list(bc.keys())[0]
+            edges_attacked.append(
+                [graph_attacked.vs[edge.source]["name"], graph_attacked.vs[edge.target]["name"]]
+            )
             graph_attacked.delete_edges(edge)
-            edges_attacked.append(edge)
             lcc.append(lnad.largest_connected_component(graph_attacked))
             slcc.append(lnad.second_largest_connected_component(graph_attacked))
             eff.append(lnad.global_efficiency(graph_attacked, weight))
@@ -166,8 +168,8 @@ class NetworkDismantling:
         eff = [lnad.global_efficiency(graph_attacked)]
 
         for i in range(nattacks):
+            nodes_attacked.append(ap[i]["name"])
             graph_attacked.delete_vertices(ap[i])
-            nodes_attacked.append(ap[i])
             lcc.append(lnad.largest_connected_component(graph_attacked))
             slcc.append(lnad.second_largest_connected_component(graph_attacked))
             eff.append(lnad.global_efficiency(graph_attacked, weight))
@@ -187,7 +189,7 @@ class NetworkDismantling:
             nattacks = self.graph.vcount()
 
         graph_attacked = self.get_graph()  # work on a local copy of the topology
-        nodes_attacked = [0]  # list with coordinates of attacked nodes
+        nodes_attacked = []  # list with coordinates of attacked nodes
 
         lcc = [lnad.largest_connected_component(graph_attacked)]
         slcc = [lnad.second_largest_connected_component(graph_attacked)]
@@ -195,8 +197,8 @@ class NetworkDismantling:
 
         for _ in range(nattacks):
             node = rd.sample(list(graph_attacked.vs), 1)
+            nodes_attacked.append(node[0]["name"])
             graph_attacked.delete_vertices(node[0])
-            nodes_attacked.append(node[0])
             lcc.append(lnad.largest_connected_component(graph_attacked))
             slcc.append(lnad.second_largest_connected_component(graph_attacked))
             eff.append(lnad.global_efficiency(graph_attacked, weight))
@@ -216,7 +218,7 @@ class NetworkDismantling:
             nattacks = self.graph.ecount()
 
         graph_attacked = self.get_graph()  # work on a local copy of the topology
-        edges_attacked = [0]  # list with coordinates of attacked edges
+        edges_attacked = []  # list with coordinates of attacked edges
 
         lcc = [lnad.largest_connected_component(graph_attacked)]
         slcc = [lnad.second_largest_connected_component(graph_attacked)]
@@ -224,8 +226,13 @@ class NetworkDismantling:
 
         for _ in range(nattacks):
             edge = rd.sample(list(graph_attacked.es), 1)
+            edges_attacked.append(
+                [
+                    graph_attacked.vs[edge[0].source]["name"],
+                    graph_attacked.vs[edge[0].target]["name"],
+                ]
+            )
             graph_attacked.delete_edges(edge[0])
-            edges_attacked.append(edge[0])
             lcc.append(lnad.largest_connected_component(graph_attacked))
             slcc.append(lnad.second_largest_connected_component(graph_attacked))
             eff.append(lnad.global_efficiency(graph_attacked, weight))

@@ -173,6 +173,7 @@ class NetworkAnalysis:
             encoding=encoding,
         )
         self.graph = ig.Graph.from_networkx(G)
+        self.graph.vs["name"] = self.graph.vs["_nx_name"]
 
     def read_adjacency(self, filename, index_col=0, create_using=nx.Graph):
         """Load network from CSV file with interdependency matrix."""
@@ -182,8 +183,13 @@ class NetworkAnalysis:
             # need to make sure dependency is interpreted as j --> i
             G = nx.from_pandas_adjacency(df.transpose(), create_using=create_using)
             self.graph = ig.Graph.from_networkx(G)
+            self.graph.vs["name"] = self.graph.vs["_nx_name"]
         else:
             self.graph = None
+
+    def write_gml(self, filename):
+        """Write graph to GML file."""
+        self.graph.write_gml(filename)
 
     def degree_centrality(self):
         return degree_centrality(self.graph)

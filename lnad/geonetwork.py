@@ -114,7 +114,9 @@ class GeoNetwork:
 
     def get_igraph(self):
         """Return graph as igraph."""
-        return ig.Graph.from_networkx(self.graph)
+        G = ig.Graph.from_networkx(self.graph)
+        G.vs["name"] = G.vs["_nx_name"]
+        return G
 
     def write_gml(self, path, stringizer=None):
         """Write topology to GML file."""
