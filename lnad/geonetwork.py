@@ -56,7 +56,13 @@ def plot_grid_topology(graph, filename=None, figsize=(12, 12), node_size=5, dpi=
 class GeoNetwork:
     """Class for representing networks with geographic data."""
     def __init__(
-        self, filename, multigraph=False, explode=False, capacity=None, epsg=None
+        self,
+        filename,
+        multigraph=False,
+        explode=False,
+        capacity=None,
+        epsg=None,
+        factor=1.0,
     ):
         """Initialise network.
 
@@ -70,7 +76,7 @@ class GeoNetwork:
         self.graph = None
         self.grid = None
         self.__multigraph = multigraph
-        self.load(filename, multigraph, explode, capacity, epsg)
+        self.load(filename, multigraph, explode, capacity, epsg, factor)
 
     def load(
         self,
@@ -95,6 +101,8 @@ class GeoNetwork:
             self.grid = self.grid.explode()
         if capacity:
             # avoid division by zero, NaN or Inf
+            if self.grid[capacity].dtype is str:
+                self.grid[capacity] = self.grid[capacity].astype(float) # convert string to float
             self.grid[capacity] = self.grid[capacity].replace(
                 to_replace=np.inf, value=np.finfo(float).max
             )
