@@ -27,6 +27,7 @@ requirements:
     - geopandas
     - momepy
     - contextily
+    - pillow
     - pathlib
     - shapely
 

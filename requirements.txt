@@ -8,4 +8,5 @@ geopandas
 momepy
 contextily
 pathlib
+pillow
 shapely
