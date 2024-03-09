@@ -1,6 +1,6 @@
 numpy
 networkx
-igraph
+python-igraph
 pycairo
 matplotlib
 pandas

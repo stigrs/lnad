@@ -20,7 +20,7 @@ requirements:
     - python
     - numpy
     - networkx
-    - igraph
+    - python-igraph
     - pycairo
     - matplotlib
     - pandas
