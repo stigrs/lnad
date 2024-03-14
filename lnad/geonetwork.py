@@ -86,6 +86,7 @@ class GeoNetwork:
         capacity=None,
         epsg=None,
         factor=1.0,
+        **kwargs
     ):
         """Load geodata for network from file (e.g. GEOJSON format)."""
         if pathlib.Path(filename).suffix == ".csv":
@@ -93,7 +94,7 @@ class GeoNetwork:
             df["geometry"] = df["geometry"].apply(wkt.loads)
             self.grid = gpd.GeoDataFrame(df, crs=epsg)
         else:  # assume it is a format geopandas can read directly
-            self.grid = gpd.read_file(filename)
+            self.grid = gpd.read_file(filename, **kwargs)
             if epsg:
                 self.grid.to_crs(epsg)
         self.__multigraph = multigraph
