@@ -63,6 +63,7 @@ class GeoNetwork:
         capacity=None,
         epsg=None,
         factor=1.0,
+        **kwargs
     ):
         """Initialise network.
 
@@ -76,7 +77,7 @@ class GeoNetwork:
         self.graph = None
         self.grid = None
         self.__multigraph = multigraph
-        self.load(filename, multigraph, explode, capacity, epsg, factor)
+        self.load(filename, multigraph, explode, capacity, epsg, factor, **kwargs)
 
     def load(
         self,
