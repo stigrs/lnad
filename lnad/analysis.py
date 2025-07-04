@@ -12,8 +12,6 @@ import numpy as np
 import pandas as pd
 import operator
 import pathlib
-import matplotlib.pyplot as plt
-
 
 def degree_centrality(G, weight=None):
     """Compute degree centrality for the nodes."""
