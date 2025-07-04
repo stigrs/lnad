@@ -1,4 +1,5 @@
 # Library for Network Analysis and Dismantling (LNAD)
+[![Python package](https://github.com/stigrs/lnad/actions/workflows/python-package.yml/badge.svg)](https://github.com/stigrs/lnad/actions/workflows/python-package.yml)
 
 Library for network analysis and dismantling.
 
