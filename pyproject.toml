@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "lnad"
 version = "2025.0.9"
-dependencies = ["numpy", "networkx", "python-igraph", "pycairo", "matplotlib", "pandas", "geopandas", "momepy", "contextily", "pathlib", "pillow", "shapely"]
+dependencies = ["numpy", "networkx", "python-igraph", "pycairo", "matplotlib", "pandas", "geopandas", "momepy", "contextily", "pillow", "shapely"]
 requires-python = ">= 3.9"
 authors = [{ name = "Stig Rune Sellevag", email = "stigrs@gmail.com" }]
 maintainers = [{ name = "Stig Rune Sellevag", email = "stigrs@gmail.com" }]
