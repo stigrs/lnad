@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lnad"
+version = "2025.0.9"
+dependencies = ["numpy", "networkx", "python-igraph", "pycairo", "matplotlib", "pandas", "geopandas", "momepy", "contextily", "pathlib", "pillow", "shapely"]
+requires-python = ">= 3.9"
+authors = [{ name = "Stig Rune Sellevag", email = "stigrs@gmail.com" }]
+maintainers = [{ name = "Stig Rune Sellevag", email = "stigrs@gmail.com" }]
+description = "Library for Network Analysis and Dismantling"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Programming Language :: Python",
+]
+
+[project.urls]
+Repository = "https://github.com/stigrs/lnad.git"

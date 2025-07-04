@@ -1,4 +1,4 @@
-# LNAD - Library for Network Analysis and Dismantling
+# Library for Network Analysis and Dismantling (LNAD)
 
 Library for network analysis and dismantling.
 
@@ -46,3 +46,7 @@ The source code can be obtained from:
 The program is install by executing:
 
     python -m pip install . --prefix=%USERPROFILE%
+
+All tests should pass, indicating that your platform is fully supported:
+
+    pytest
